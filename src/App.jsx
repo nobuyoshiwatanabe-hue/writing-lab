@@ -187,7 +187,7 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
           className="w-full flex items-center justify-between px-5 py-4"
         >
           <span className="font-bold text-gray-800 text-sm">📝 投稿を追加</span>
-          <span className="text-gray-400 text-xs">{showForm ? '▲' : '▼'}|/span>
+          <span className="text-gray-400 text-xs">{showForm ? '▲' : '▼'}</span>
         </button>
         {showForm && (
           <div className="px-5 pb-5 border-t border-gray-50 pt-4 space-y-3">
