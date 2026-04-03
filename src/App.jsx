@@ -16,7 +16,7 @@ function makeApi(token) {
   return {
     async getPosts() {
       const r = await fetch('/api/posts', { headers: headers() });
-      if (!r.ok) throw new Error((await r.json()).error || 'APIã¨ã©ã¼');
+      if (!r.ok) throw new Error((await r.json()).error || 'APIエラー');
       return r.json();
     },
     async addPost(title, text) {
@@ -25,12 +25,12 @@ function makeApi(token) {
         headers: headers(),
         body: JSON.stringify({ title, text }),
       });
-      if (!r.ok) throw new Error((await r.json()).error || 'APIã¨ã©ã¼');
+      if (!r.ok) throw new Error((await r.json()).error || 'APIエラー');
       return r.json();
     },
     async deletePost(id) {
       const r = await fetch(`/api/posts?id=${id}`, { method: 'DELETE', headers: headers() });
-      if (!r.ok) throw new Error((await r.json()).error || 'APIã¨ã©ã¼');
+      if (!r.ok) throw new Error((await r.json()).error || 'APIエラー');
     },
     async ai(type, posts, text, model, apiKey) {
       const r = await fetch('/api/ai', {
@@ -38,7 +38,7 @@ function makeApi(token) {
         headers: headers(),
         body: JSON.stringify({ type, posts, text, model, apiKey }),
       });
-      if (!r.ok) throw new Error((await r.json()).error || 'AIã¨ã©ã¼');
+      if (!r.ok) throw new Error((await r.json()).error || 'AIエラー');
       return (await r.json()).result;
     },
     async ping() {
@@ -58,7 +58,7 @@ function Md({ text }) {
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/^---$/gm, '<hr/>')
-    .replace(/^[-â¢] (.+)$/gm, '<ul><li>$1</li></ul>')
+    .replace(/^[-•] (.+)$/gm, '<ul><li>$1</li></ul>')
     .replace(/^(\d+)\. (.+)$/gm, '<ol><li>$2</li></ol>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br/>');
@@ -90,7 +90,7 @@ function Btn({ onClick, disabled, loading, children, variant = 'primary', classN
   };
   return (
     <button onClick={onClick} disabled={disabled || loading} className={`${base} ${variants[variant]} ${className}`}>
-      {loading ? <><span className="spin">â³</span> å¦çä¸­â¦</> : children}
+      {loading ? <><span className="spin">⏳</span> 処理中…</> : children}
     </button>
   );
 }
@@ -113,7 +113,7 @@ function AuthScreen({ onAuth }) {
       ls.set('wl_token', pw.trim());
       onAuth(pw.trim());
     } else {
-      setError('ãã¹ã¯ã¼ããéãã¾ã');
+      setError('パスワードが違います');
     }
     setChecking(false);
   };
@@ -122,14 +122,14 @@ function AuthScreen({ onAuth }) {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="text-4xl mb-2">âï¸</div>
+          <div className="text-4xl mb-2">✏️</div>
           <h1 className="text-xl font-bold text-gray-900">Writing Lab</h1>
-          <p className="text-sm text-gray-400 mt-1">ãã¹ã¯ã¼ããå¥åãã¦ãã ãã</p>
+          <p className="text-sm text-gray-400 mt-1">パスワードを入力してください</p>
         </div>
         <form onSubmit={submit} className="space-y-3">
           <input
             type="password"
-            placeholder="ãã¹ã¯ã¼ã"
+            placeholder="パスワード"
             value={pw}
             onChange={e => setPw(e.target.value)}
             autoFocus
@@ -137,7 +137,7 @@ function AuthScreen({ onAuth }) {
           />
           {error && <Alert type="error" msg={error} />}
           <Btn onClick={submit} loading={checking} disabled={!pw.trim()} className="w-full justify-center">
-            ã­ã°ã¤ã³
+            ログイン
           </Btn>
         </form>
       </div>
@@ -146,7 +146,7 @@ function AuthScreen({ onAuth }) {
 }
 
 /* ===================================================================
-   TAB 1: æç¨¿ãã³ã¯
+   TAB 1: 投稿バンク
 ====================================================================== */
 function PostBank({ posts, loading, onAdd, onDelete }) {
   const [title, setTitle] = useState('');
@@ -167,7 +167,7 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
   };
 
   const del = async (id) => {
-    if (!window.confirm('ãã®æç¨¿ãåé¤ãã¾ããï¼')) return;
+    if (!window.confirm('この投稿を削除しますか？')) return;
     setSaving(id);
     await onDelete(id);
     setSaving(null);
@@ -186,14 +186,14 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
           onClick={() => setShowForm(v => !v)}
           className="w-full flex items-center justify-between px-5 py-4"
         >
-          <span className="font-bold text-gray-800 text-sm">ð æç¨¿ãè¿½å </span>
-          <span className="text-gray-400 text-xs">{showForm ? 'â²' : 'â¼'}|/span>
+          <span className="font-bold text-gray-800 text-sm">📝 投稿を追加</span>
+          <span className="text-gray-400 text-xs">{showForm ? '▲' : '▼'}|/span>
         </button>
         {showForm && (
           <div className="px-5 pb-5 border-t border-gray-50 pt-4 space-y-3">
             <input
               type="text"
-              placeholder="ã¿ã¤ãã«ï¼ä»»æï¼"
+              placeholder="タイトル（任意）"
               value={title}
               onChange={e => setTitle(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
@@ -201,20 +201,20 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
             <div className="relative">
               <textarea
                 ref={textRef}
-                placeholder="æç¨¿ãã­ã¹ããããã«è²¼ãä»ãâ¦"
+                placeholder="投稿テキストをここに貼り付け…"
                 value={text}
                 onChange={e => setText(e.target.value)}
                 rows={5}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition resize-none"
                 onKeyDown={e => { if (e.ctrlKey && e.key === 'Enter') add(); }}
               />
-              <span className="absolute bottom-2 right-3 text-xs text-gray-300">{text.length}æå­</span>
+              <span className="absolute bottom-2 right-3 text-xs text-gray-300">{text.length}文字</span>
             </div>
             <div className="flex items-center gap-3">
               <Btn onClick={add} loading={saving === 'add'} disabled={!text.trim()}>
-                ä¿å­ãã
+                保存する
               </Btn>
-              <span className="text-xs text-gray-300 hidden sm:inline">Ctrl+Enter ã§ãä¿å­</span>
+              <span className="text-xs text-gray-300 hidden sm:inline">Ctrl+Enter でも保存</span>
             </div>
           </div>
         )}
@@ -223,11 +223,11 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
       {/* List */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <span className="text-sm font-medium text-gray-500">
-          {loading ? 'èª­ã¿è¾¼ã¿ä¸­â¦' : `${posts.length} ä»¶ã®æç¨¿`}
+          {loading ? '読み込み中…' : `${posts.length} 件の投稿`}
         </span>
         <input
           type="search"
-          placeholder="ð æ¤ç´¢â¦"
+          placeholder="🔍 検索…"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="border border-gray-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 w-40 transition"
@@ -237,14 +237,14 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
       <div className="space-y-3">
         {loading && (
           <div className="text-center py-12 text-gray-400 text-sm">
-            <span className="spin text-2xl">â³</span>
+            <span className="spin text-2xl">⏳</span>
           </div>
         )}
         {!loading && filtered.length === 0 && (
           <div className="text-center py-14 text-gray-400">
-            <div className="text-4xl mb-3">ð­</div>
+            <div className="text-4xl mb-3">📭</div>
             <div className="text-sm">
-              {posts.length === 0 ? 'æç¨¿ãè¿½å ãã¦ãã ãã' : 'æ¤ç´¢çµæãããã¾ãã'}
+              {posts.length === 0 ? '投稿を追加してください' : '検索結果がありません'}
             </div>
           </div>
         )}
@@ -264,7 +264,7 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
                   {expanded === post.id
                     ? post.text
                     : post.text.length > 120
-                      ? post.text.slice(0, 120) + 'â¦'
+                      ? post.text.slice(0, 120) + '…'
                       : post.text}
                 </div>
                 {post.text.length > 120 && (
@@ -272,7 +272,7 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
                     onClick={() => setExpanded(expanded === post.id ? null : post.id)}
                     className="text-indigo-400 text-xs mt-1.5 hover:underline"
                   >
-                    {expanded === post.id ? 'æãããã â²' : 'å¨æãè¡¨ç¤º â¼'}
+                    {expanded === post.id ? '折りたたむ ▲' : '全文を表示 ▼'}
                   </button>
                 )}
               </div>
@@ -280,9 +280,9 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
                 onClick={() => del(post.id)}
                 disabled={saving === post.id}
                 className="text-gray-200 hover:text-red-400 transition text-xl leading-none flex-shrink-0 disabled:opacity-40"
-                title="åé¤"
+                title="削除"
               >
-                {saving === post.id ? <span className="spin text-sm">â³</span> : 'Ã'}
+                {saving === post.id ? <span className="spin text-sm">⏳</span> : '×'}
               </button>
             </div>
           </div>
@@ -293,7 +293,7 @@ function PostBank({ posts, loading, onAdd, onDelete }) {
 }
 
 /* ===================================================================
-   TAB 2: å¾ååæ
+   TAB 2: 傾向分析
 ====================================================================== */
 function TrendAnalysis({ posts, api, model, apiKey, hasServerKey }) {
   const [loading, setLoading] = useState(false);
@@ -315,14 +315,14 @@ function TrendAnalysis({ posts, api, model, apiKey, hasServerKey }) {
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h2 className="text-lg font-bold text-gray-800 mb-1">ð å¾ååæ</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-1">📊 傾向分析</h2>
         <p className="text-sm text-gray-500 mb-4">
-          ãã³ã¯åã® <strong className="text-gray-700">{posts.length} ä»¶</strong> ã®æç¨¿ãAIãåæã
-          ããºããããæç« ã®ãã¿ã¼ã³ãæ½åºãã¾ãã
+          バンク内の <strong className="text-gray-700">{posts.length} 件</strong> の投稿をAIが分析。
+          バズりやすい文章のパターンを抽出します。
         </p>
-        {needsKey && <Alert type="warn" msg="âï¸ è¨­å®ã¿ãã§OpenAI APIã­ã¼ãå¥åãã¦ãã ãã" />}
+        {needsKey && <Alert type="warn" msg="⚙️ 設定タブでOpenAI APIキーを入力してください" />}
         {posts.length < 2 && (
-          <Alert type="warn" msg={`åæã«ã¯2ä»¶ä»¥ä¸ã®æç¨¿ãå¿è¦ã§ãï¼ç¾å¨ ${posts.length} ä»¶ï¼`} />
+          <Alert type="warn" msg={`分析には2件以上の投稿が必要です（現在 ${posts.length} 件）`} />
         )}
         <Btn
           onClick={analyze}
@@ -330,17 +330,17 @@ function TrendAnalysis({ posts, api, model, apiKey, hasServerKey }) {
           disabled={posts.length < 2 || needsKey}
           className="mt-4"
         >
-          â¨ åæãã
+          ✨ 分析する
         </Btn>
       </div>
 
-      {error && <Alert type="error" msg={`â ${error}`} />}
+      {error && <Alert type="error" msg={`❌ ${error}`} />}
 
       {result && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 fade-in">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-800">ð¯ åæçµæ</h3>
-            <span className="text-xs text-gray-400">{posts.length}ä»¶ãåæ</span>
+            <h3 className="font-bold text-gray-800">🎯 分析結果</h3>
+            <span className="text-xs text-gray-400">{posts.length}件を分析</span>
           </div>
           <Md text={result} />
           <CopyBtn text={result} className="mt-4" />
@@ -351,7 +351,7 @@ function TrendAnalysis({ posts, api, model, apiKey, hasServerKey }) {
 }
 
 /* ===================================================================
-   TAB 3: AIæ·»å
+   TAB 3: AI添削
 ====================================================================== */
 function AIEditing({ posts, api, model, apiKey, hasServerKey }) {
   const [input, setInput] = useState('');
@@ -374,48 +374,48 @@ function AIEditing({ posts, api, model, apiKey, hasServerKey }) {
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h2 className="text-lg font-bold text-gray-800 mb-1">âï¸ AIæ·»å</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-1">✍️ AI添削</h2>
         <p className="text-sm text-gray-500 mb-4">
-          ãã³ã¯åã®æç¨¿ã¹ã¿ã¤ã«ãåèã«ãæ°ããæ¸ããæç« ãAIãæ·»åãã¾ãã
+          バンク内の投稿スタイルを参考に、新しく書いた文章をAIが添削します。
           {posts.length > 0 && (
-            <span className="text-indigo-500">ï¼{Math.min(posts.length, 10)}ä»¶ãåèä½¿ç¨ï¼</span>
+            <span className="text-indigo-500">（{Math.min(posts.length, 10)}件を参考使用）</span>
           )}
         </p>
-        {needsKey && <Alert type="warn" msg="âï¸ è¨­å®ã¿ãã§OpenAI APIã­ã¼ãå¥åãã¦ãã ãã" />}
+        {needsKey && <Alert type="warn" msg="⚙️ 設定タブでOpenAI APIキーを入力してください" />}
         <div className="mt-3 space-y-3">
           <div className="relative">
             <textarea
-              placeholder="æ·»åãã¦ã»ããæç« ãå¥åãã¦ãã ããâ¦"
+              placeholder="添削してほしい文章を入力してください…"
               value={input}
               onChange={e => setInput(e.target.value)}
               rows={7}
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition resize-none"
               onKeyDown={e => { if (e.ctrlKey && e.key === 'Enter') edit(); }}
             />
-            <span className="absolute bottom-2 right-3 text-xs text-gray-300">{input.length}æå­</span>
+            <span className="absolute bottom-2 right-3 text-xs text-gray-300">{input.length}文字</span>
           </div>
           <div className="flex items-center gap-3">
             <Btn onClick={edit} loading={loading} disabled={!input.trim() || needsKey}>
-              â¨ æ·»åãã
+              ✨ 添削する
             </Btn>
             {input && (
               <button
                 onClick={() => { setInput(''); setResult(''); setError(''); }}
                 className="text-sm text-gray-400 hover:text-gray-600 transition"
               >
-                ã¯ãªã¢
+                クリア
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {error && <Alert type="error" msg={`â ${error}`} />}
+      {error && <Alert type="error" msg={`❌ ${error}`} />}
 
       {result && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 fade-in">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-800">ð¡ æ·»åçµæ</h3>
+            <h3 className="font-bold text-gray-800">💡 添削結果</h3>
             <CopyBtn text={result} />
           </div>
           <Md text={result} />
@@ -440,13 +440,13 @@ function CopyBtn({ text, className = '' }) {
           : 'border-indigo-200 text-indigo-500 hover:bg-indigo-50'
       } ${className}`}
     >
-      {copied ? 'â ã³ãã¼æ¸ã¿' : 'ð ã³ãã¼'}
+      {copied ? '✅ コピー済み' : '📋 コピー'}
     </button>
   );
 }
 
 /* ===================================================================
-   TAB 4: è¨­å®
+   TAB 4: 設定
 ====================================================================== */
 function Settings({ apiKey, setApiKey, model, setModel, hasServerKey, token, onLogout, postCount }) {
   const [localKey, setLocalKey] = useState(apiKey);
@@ -465,14 +465,14 @@ function Settings({ apiKey, setApiKey, model, setModel, hasServerKey, token, onL
     <div className="space-y-5">
       {/* OpenAI Settings */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h2 className="text-lg font-bold text-gray-800 mb-4">âï¸ è¨­å®</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4">⚙️ 設定</h2>
 
         {hasServerKey ? (
-          <Alert type="success" msg="â OpenAI APIã­ã¼ã¯ãµã¼ãã¼å´ã§è¨­å®æ¸ã¿ã§ããå¥åä¸è¦ã§ãã" />
+          <Alert type="success" msg="✅ OpenAI APIキーはサーバー側で設定済みです。入力不要です。" />
         ) : (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              OpenAI APIã­ã¼
+              OpenAI APIキー
             </label>
             <div className="relative">
               <input
@@ -486,28 +486,28 @@ function Settings({ apiKey, setApiKey, model, setModel, hasServerKey, token, onL
                 onClick={() => setShowKey(v => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
               >
-                {showKey ? 'é ã' : 'è¡¨ç¤º'}
+                {showKey ? '隠す' : '表示'}
               </button>
             </div>
             <p className="text-xs text-gray-400 mt-1.5">
               <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer"
-                className="text-indigo-500 hover:underline">platform.openai.com</a> ã§åå¾ã§ãã¾ãã
-              ãã®ã­ã¼ã¯ãã®ããã¤ã¹ã®ãã©ã¦ã¶ã«ã®ã¿ä¿å­ããã¾ãã
+                className="text-indigo-500 hover:underline">platform.openai.com</a> で取得できます。
+              このキーはこのデバイスのブラウザにのみ保存されます。
             </p>
           </div>
         )}
 
         <div className="mb-5 mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">ä½¿ç¨ã¢ãã«</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">使用モデル</label>
           <select
             value={model}
             onChange={e => { setModel(e.target.value); ls.set('wl_model', e.target.value); }}
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition bg-white"
           >
-            <option value="gpt-4o-mini">gpt-4o-miniï¼æ¨å¥¨ã»ä½ã³ã¹ãï¼</option>
-            <option value="gpt-4o">gpt-4oï¼é«åè³ªï¼</option>
-            <option value="gpt-4.1-mini">gpt-4.1-miniï¼ææ°ã»ä½ã³ã¹ãï¼</option>
-            <option value="gpt-4.1">gpt-4.1ï¼ææ°ã»é«åè³ªï¼</option>
+            <option value="gpt-4o-mini">gpt-4o-mini（推奨・低コスト）</option>
+            <option value="gpt-4o">gpt-4o（高品質）</option>
+            <option value="gpt-4.1-mini">gpt-4.1-mini（最新・低コスト）</option>
+            <option value="gpt-4.1">gpt-4.1（最新・高品質）</option>
           </select>
         </div>
 
@@ -516,41 +516,41 @@ function Settings({ apiKey, setApiKey, model, setModel, hasServerKey, token, onL
             onClick={save}
             variant={saved ? 'secondary' : 'primary'}
           >
-            {saved ? 'â ä¿å­ãã¾ãã' : 'ä¿å­ãã'}
+            {saved ? '✅ 保存しました' : '保存する'}
           </Btn>
         )}
       </div>
 
       {/* Cost guide */}
       <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
-        <p className="font-semibold text-blue-800 text-sm mb-3">ð° è²»ç¨ã®ç®å®ï¼gpt-4o-miniï¼</p>
+        <p className="font-semibold text-blue-800 text-sm mb-3">💰 費用の目安（gpt-4o-mini）</p>
         <div className="space-y-1.5 text-xs text-blue-700">
           <div className="flex justify-between">
-            <span>å¾ååæ 1åï¼20ä»¶ç¨åº¦ï¼</span>
-            <span className="font-medium">â 0.1ã1å</span>
+            <span>傾向分析 1回（20件程度）</span>
+            <span className="font-medium">≈ 0.1〜1円</span>
           </div>
           <div className="flex justify-between">
-            <span>AIæ·»å 1å</span>
-            <span className="font-medium">â 0.1ã0.8å</span>
+            <span>AI添削 1回</span>
+            <span className="font-medium">≈ 0.1〜0.8円</span>
           </div>
           <p className="text-blue-500 mt-2 pt-2 border-t border-blue-100">
-            æ100åä½¿ã£ã¦ãæ°åãæ°ç¾åã®è¦è¾¼ã¿
+            月100回使っても数十〜数百円の見込み
           </p>
         </div>
       </div>
 
       {/* Data / Auth */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <p className="font-semibold text-gray-800 text-sm mb-3">ð¾ ãã¼ã¿æå ±</p>
+        <p className="font-semibold text-gray-800 text-sm mb-3">💾 データ情報</p>
         <div className="text-sm text-gray-500 space-y-1.5 mb-4">
-          <p>â¢ æç¨¿ãã¼ã¿ï¼<strong className="text-gray-700">{postCount} ä»¶</strong>ï¼ã¯ã©ã¦ãDBã«ä¿å­ï¼</p>
-          <p>â¢ ãã¼ã¿ã¯ã©ã®ããã¤ã¹ãããåããã®ã«ã¢ã¯ã»ã¹ã§ãã¾ã</p>
+          <p>• 投稿データ：<strong className="text-gray-700">{postCount} 件</strong>（クラウドDBに保存）</p>
+          <p>• データはどのデバイスからも同じものにアクセスできます</p>
         </div>
         <button
           onClick={onLogout}
           className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 transition hover:bg-gray-50"
         >
-          ãã®ããã¤ã¹ããã­ã°ã¢ã¦ã
+          このデバイスからログアウト
         </button>
       </div>
     </div>
@@ -562,7 +562,7 @@ function Settings({ apiKey, setApiKey, model, setModel, hasServerKey, token, onL
 ====================================================================== */
 export default function App() {
   const [token, setToken] = useState(() => ls.get('wl_token', ''));
-  const [tab, setTab] = useState('æç¨¿ãã³ã¯');
+  const [tab, setTab] = useState('投稿バンク');
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const [postsError, setPostsError] = useState('');
@@ -608,14 +608,14 @@ export default function App() {
     try {
       const post = await api.addPost(title, text);
       setPosts(prev => [post, ...prev]);
-    } catch (e) { alert('ä¿å­å¤±æ: ' + e.message); }
+    } catch (e) { alert('保存失敗: ' + e.message); }
   }, [api]);
 
   const handleDelete = useCallback(async (id) => {
     try {
       await api.deletePost(id);
       setPosts(prev => prev.filter(p => p.id !== id));
-    } catch (e) { alert('åé¤å¤±æ: ' + e.message); }
+    } catch (e) { alert('削除失敗: ' + e.message); }
   }, [api]);
 
   const logout = () => {
@@ -630,34 +630,34 @@ export default function App() {
   }
 
   const TABS = [
-    { id: 'æç¨¿ãã³ã¯', icon: 'ð', badge: posts.length > 0 ? posts.length : null },
-    { id: 'å¾ååæ',  icon: 'ð', badge: null },
-    { id: 'AIæ·»å',   icon: 'âï¸',  badge: null },
-    { id: 'è¨­å®',      icon: 'âï¸',  badge: !hasServerKey && !apiKey ? '!' : null },
+    { id: '投稿バンク', icon: '📚', badge: posts.length > 0 ? posts.length : null },
+    { id: '傾向分析',  icon: '📊', badge: null },
+    { id: 'AI添削',   icon: '✍️',  badge: null },
+    { id: '設定',      icon: '⚙️',  badge: !hasServerKey && !apiKey ? '!' : null },
   ];
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6 pb-16 min-h-screen">
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">âï¸ Writing Lab</h1>
-        <p className="text-sm text-gray-400 mt-0.5">SNSæç¨¿ãè²¯ãã¦ã»åæãã¦ã»ç£¨ã</p>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">✏️ Writing Lab</h1>
+        <p className="text-sm text-gray-400 mt-0.5">SNS投稿を貯めて・分析して・磨く</p>
       </div>
 
       {/* API key reminder */}
       {!hasServerKey && !apiKey && (
         <div
           className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 mb-5 cursor-pointer hover:bg-amber-100 transition"
-          onClick={() => setTab('è¨­å®')}
+          onClick={() => setTab('設定')}
         >
-          âï¸ <strong>è¨­å®ã¿ã</strong>ã§OpenAI APIã­ã¼ãå¥åããã¨AIæ©è½ãä½¿ãã¾ã â
+          ⚙️ <strong>設定タブ</strong>でOpenAI APIキーを入力するとAI機能が使えます →
         </div>
       )}
 
       {/* Error banner */}
       {postsError && (
         <div className="mb-4">
-          <Alert type="error" msg={`cã¼ã¿åå¾ã¨ã©ã¼: ${postsError}`} />
+          <Alert type="error" msg={`c��ータ取得エラー: ${postsError}`} />
         </div>
       )}
 
@@ -688,7 +688,7 @@ export default function App() {
 
       {/* Content */}
       <div>
-        {tab === 'æç¨¿ãã³ã¯' && (
+        {tab === '投稿バンク' && (
           <PostBank
             posts={posts}
             loading={postsLoading}
@@ -696,7 +696,7 @@ export default function App() {
             onDelete={handleDelete}
           />
         )}
-        {tab === 'å¾ååæ' && (
+        {tab === '傾向分析' && (
           <TrendAnalysis
             posts={posts}
             api={api}
@@ -705,7 +705,7 @@ export default function App() {
             hasServerKey={hasServerKey}
           />
         )}
-        {tab === 'AIæ·»å' && (
+        {tab === 'AI添削' && (
           <AIEditing
             posts={posts}
             api={api}
@@ -714,7 +714,7 @@ export default function App() {
             hasServerKey={hasServerKey}
           />
         )}
-        {tab === 'è¨­å®' && (
+        {tab === '設定' && (
           <Settings
             apiKey={apiKey}
             setApiKey={setApiKey}
